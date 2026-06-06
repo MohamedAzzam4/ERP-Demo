@@ -38,16 +38,19 @@ Excel Workbook (متابعة انتاج وبيع خيوط الغزل.xlsx)
 7. **6 CRUD modules**: Raw Materials, Spinning, Twisting, Inventory, Sales, Complaints
 8. **Chart library**: Recharts for dashboard visualizations
 9. **Icons**: lucide-react
+10. **Derived Chart & KPI State** — Chart and KPI data are calculated dynamically from Zustand state arrays (no static arrays in store), ensuring reactivity to CRUD updates.
+11. **Dashboard Date Filtering** — Full month and year selection options filter both KPIs and chart datasets dynamically.
+12. **Robust Unique IDs** — `crypto.randomUUID()` replaces naive incremental ID mapping for newly created records.
 
 ## 4. KPI Derivations
 
 | KPI | Source | Formula |
 |---|---|---|
-| إجمالي المبيعات (Total Sales) | sales | Σ (weightKg × pricePerTon / 1000) |
-| مستوى المخزون (Inventory Level) | inventory | Σ weightKg in warehouse (non-returned) |
-| نسبة العادم (Waste Ratio) | spinning + twisting | avg(agreedWastePercent) for spinning; avg(actualWastePercent) for twisting |
-| ملخص الإنتاج (Production Summary) | spinning + twisting | Σ produced weight per factory |
-| معدل الشكاوى (Complaint Rate) | complaints / sales | count(complaints) / count(sales) × 100 |
+| إجمالي المبيعات (Total Sales) | sales | Σ (weightKg × pricePerTon / 1000) (subject to month/year filter) |
+| مستوى المخزون (Inventory Level) | inventory | Σ weightKg in warehouse (non-returned) (subject to month/year filter) |
+| نسبة العادم (Waste Ratio) | spinning + twisting | avg(agreedWastePercent) for spinning; avg(actualWastePercent) for twisting (subject to month/year filter) |
+| ملخص الإنتاج (Production Summary) | spinning + twisting | Σ produced weight per factory (subject to month/year filter) |
+| معدل الشكاوى (Complaint Rate) | complaints / sales | count(complaints) / count(sales) × 100 (subject to month/year filter) |
 | متوسط الجودة (Avg Quality) | quality metrics in spinning/twisting | avg(RKM) across records |
 
 ## 5. Assumptions
@@ -67,9 +70,12 @@ Excel Workbook (متابعة انتاج وبيع خيوط الغزل.xlsx)
 
 ## 6. Changelog
 
+- [2026-06-06] Fixed BUG-001 (Dynamic charts and date filters implemented on Dashboard)
+- [2026-06-06] Fixed ENH-001 (Naive ID generation replaced with `crypto.randomUUID()`)
 - [2026-06-06] Initial workbook analysis completed
 - [2026-06-06] workbook-analysis.md created
 - [2026-06-06] memory.md created
 - [2026-06-06] Architecture decided: Vite + React + Tailwind + Zustand + Recharts
 - [2026-06-06] 6 CRUD modules defined based on workbook evidence
 - [2026-06-06] Quality Level sheet excluded as separate CRUD (reference only)
+
