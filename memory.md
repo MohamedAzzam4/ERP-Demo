@@ -41,6 +41,7 @@ Excel Workbook (متابعة انتاج وبيع خيوط الغزل.xlsx)
 10. **Derived Chart & KPI State** — Chart and KPI data are calculated dynamically from Zustand state arrays (no static arrays in store), ensuring reactivity to CRUD updates.
 11. **Dashboard Date Filtering** — Full month and year selection options filter both KPIs and chart datasets dynamically.
 12. **Robust Unique IDs** — `crypto.randomUUID()` replaces naive incremental ID mapping for newly created records.
+13. **Dynamic Table Sorting** — Columns across all CRUD modules are interactive and allow sorting (ascending, descending, or clearing) of data rows dynamically.
 
 ## 4. KPI Derivations
 
@@ -70,6 +71,7 @@ Excel Workbook (متابعة انتاج وبيع خيوط الغزل.xlsx)
 
 ## 6. Changelog
 
+- [2026-06-06] Implemented interactive table column sorting across all CRUD modules.
 - [2026-06-06] Fixed BUG-001 (Dynamic charts and date filters implemented on Dashboard)
 - [2026-06-06] Fixed ENH-001 (Naive ID generation replaced with `crypto.randomUUID()`)
 - [2026-06-06] Initial workbook analysis completed

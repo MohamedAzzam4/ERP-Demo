@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import useStore from '../store/useStore';
 import { fmtNum, fmtCurrency, fmtDate } from '../utils/format';
-import { Plus, Pencil, Trash2, X, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Search, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 
 // ─── MODULE CONFIGS ───────────────────────────────────────────────
 const moduleConfigs = {
@@ -213,12 +213,44 @@ export default function CrudModule({ moduleKey }) {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({});
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
-  const filtered = data.filter(row =>
-    !search || Object.values(row).some(v =>
-      String(v).toLowerCase().includes(search.toLowerCase())
-    )
-  );
+  const filteredData = useMemo(() => {
+    let result = data.filter(row =>
+      !search || Object.values(row).some(v =>
+        String(v).toLowerCase().includes(search.toLowerCase())
+      )
+    );
+
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+        
+        if (aVal === bVal) return 0;
+        if (aVal == null) return sortConfig.direction === 'asc' ? 1 : -1;
+        if (bVal == null) return sortConfig.direction === 'asc' ? -1 : 1;
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+        
+        return sortConfig.direction === 'asc' ? (aVal < bVal ? -1 : 1) : (aVal < bVal ? 1 : -1);
+      });
+    }
+    return result;
+  }, [data, search, sortConfig]);
+
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    } else if (sortConfig.key === key && sortConfig.direction === 'desc') {
+      setSortConfig({ key: null, direction: 'asc' });
+      return;
+    }
+    setSortConfig({ key, direction });
+  };
 
   const openAdd = () => {
     const init = {};
@@ -302,13 +334,28 @@ export default function CrudModule({ moduleKey }) {
             <tr className="bg-gray-50 text-gray-600">
               <th className="p-3 text-start font-medium">#</th>
               {config.columns.map(col => (
-                <th key={col.key} className="p-3 text-start font-medium">{col.label}</th>
+                <th 
+                  key={col.key} 
+                  className="p-3 text-start font-medium cursor-pointer hover:bg-gray-100 transition-colors select-none group"
+                  onClick={() => handleSort(col.key)}
+                >
+                  <div className="flex items-center gap-1">
+                    {col.label}
+                    <span className="text-gray-400 group-hover:text-blue-500">
+                      {sortConfig.key === col.key ? (
+                        sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4 text-blue-600" /> : <ArrowDown className="w-4 h-4 text-blue-600" />
+                      ) : (
+                        <ArrowUpDown className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      )}
+                    </span>
+                  </div>
+                </th>
               ))}
               <th className="p-3 text-start font-medium">إجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((row, idx) => (
+            {filteredData.map((row, idx) => (
               <tr key={row.id} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors">
                 <td className="p-3 text-gray-400">{idx + 1}</td>
                 {config.columns.map(col => (
@@ -334,7 +381,7 @@ export default function CrudModule({ moduleKey }) {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
+            {filteredData.length === 0 && (
               <tr>
                 <td colSpan={config.columns.length + 2} className="p-8 text-center text-gray-400">
                   لا توجد بيانات
